@@ -1,0 +1,40 @@
+name: build
+
+on:
+  release:
+    types: [ published ]
+
+permissions:
+    contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [
+          {name: hostseditor, platform: windows/amd64, os: windows-latest},
+          # {name: hostseditor, platform: darwin/universal, os: macos-latest}
+        ]
+    runs-on: ${{ matrix.build.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: dAppServer/wails-build-action@v2.2
+        with:
+          build-name: ${{ matrix.build.name }}
+          build-platform: ${{ matrix.build.platform }}
+          nsis: false
+      # Upload build assets
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Wails Build ${{runner.os}} ${{matrix.build.name}}
+          path: |
+            */bin/
+            *\bin\*
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            */bin/*    
