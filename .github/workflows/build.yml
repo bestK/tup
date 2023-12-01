@@ -27,3 +27,4 @@ jobs:
             goarch: ${{ matrix.goarch }}
             goversion: 1.21.4
             binary_name: "tup"
+            executable_compression: upx
