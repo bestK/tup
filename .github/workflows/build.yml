@@ -9,29 +9,21 @@ permissions:
 
 
 jobs:
-    release:
-        name: Release on GitHub
-        runs-on: ubuntu-latest
-        steps:
-        - name: Check out code
-          uses: actions/checkout@v1
-
-        - name: Set up Go
-          uses: actions/setup-go@v2
+    build-go-binary:
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          goos: [windows]
+          goarch: [amd64, arm64] 
+          exclude:
+            - goarch: arm64
+              goos: windows
+      steps:
+        - uses: actions/checkout@v3
+        - uses: wangyoucao577/go-release-action@v1.30
           with:
-            go-version: 1.21.4
-
-        - name: Set GOROOT for Release
-          run: echo "GOROOT=${RUNNER_TOOL_CACHE}/go/1.21.4/x64" >> $GITHUB_ENV
-    
-        - name: Validates GO releaser config
-          uses: docker://goreleaser/goreleaser:latest
-          with:
-            args: check
-    
-        - name: Create release on GitHub
-          uses: docker://goreleaser/goreleaser:latest
-          with:
-            args: release
-          env:
-            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}    
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            goos: ${{ matrix.goos }}
+            goarch: ${{ matrix.goarch }}
+            goversion: 1.21.4
+            binary_name: "tup"
