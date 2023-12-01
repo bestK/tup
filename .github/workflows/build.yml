@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         build: [
-          {name: hostseditor, platform: windows/amd64, os: windows-latest},
-          # {name: hostseditor, platform: darwin/universal, os: macos-latest}
+          {name: tup, platform: windows/amd64, os: windows-latest},
+          # {name: tup, platform: darwin/universal, os: macos-latest}
         ]
     runs-on: ${{ matrix.build.os }}
     steps:
