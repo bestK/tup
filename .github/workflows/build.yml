@@ -19,7 +19,10 @@ jobs:
         - name: Set up Go
           uses: actions/setup-go@v2
           with:
-            go-version: 1.21.4  
+            go-version: 1.21.4
+
+        - name: Set GOROOT for Release
+          run: echo "GOROOT=${RUNNER_TOOL_CACHE}/go/1.21.4/x64" >> $GITHUB_ENV
     
         - name: Validates GO releaser config
           uses: docker://goreleaser/goreleaser:latest
