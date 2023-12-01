@@ -7,34 +7,23 @@ on:
 permissions:
     contents: write
 
+
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        build: [
-          {name: tup, platform: windows/amd64, os: windows-latest},
-          # {name: tup, platform: darwin/universal, os: macos-latest}
-        ]
-    runs-on: ${{ matrix.build.os }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: dAppServer/wails-build-action@v2.2
-        with:
-          build-name: ${{ matrix.build.name }}
-          build-platform: ${{ matrix.build.platform }}
-          nsis: false
-      # Upload build assets
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Wails Build ${{runner.os}} ${{matrix.build.name}}
-          path: |
-            */bin/
-            *\bin\*
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            */bin/*    
+    release:
+        name: Release on GitHub
+        runs-on: ubuntu-latest
+        steps:
+        - name: Check out code
+          uses: actions/checkout@v1
+    
+        - name: Validates GO releaser config
+          uses: docker://goreleaser/goreleaser:latest
+          with:
+            args: check
+    
+        - name: Create release on GitHub
+          uses: docker://goreleaser/goreleaser:latest
+          with:
+            args: release
+          env:
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}    
